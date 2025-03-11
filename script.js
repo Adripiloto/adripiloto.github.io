@@ -5,47 +5,55 @@ const appId = "dph0vlblv8wfdsu96qsdum1diom8xmfjsq9kfrozn4jamqluolgsrrn2l8jpflsx"
 
 // Esperar a que se cargue el SDK de Pi
 document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        // Inicializar el SDK de Pi Network
-        Pi.init({ version: "2.0" });
-    } catch (err) {
-        console.error("Error al inicializar Pi SDK:", err);
-    }
-});
+    const loginBtn = document.getElementById("loginBtn");
+    const betBtn = document.getElementById("betBtn");
+    const playBtn = document.getElementById("playBtn");
+    const resultText = document.getElementById("result");
+    const slots = [document.getElementById("slot1"), document.getElementById("slot2"), document.getElementById("slot3")];
+    let user;
 
-// Manejar el inicio de sesión
-document.getElementById("loginBtn").addEventListener("click", async () => {
-    try {
-        const scopes = ["username", "payments"]; // Permisos que necesitamos
-        const authResult = await Pi.authenticate(scopes);
+    // Login con Pi Network
+    loginBtn.addEventListener("click", async () => {
+        try {
+            user = await Pi.authenticate(["payments"], (res) => res);
+            console.log("User authenticated:", user);
+            document.getElementById("game").style.display = "block";
+        } catch (err) {
+            console.error("Authentication error:", err);
+        }
+    });
+
+    // Realizar apuesta
+    betBtn.addEventListener("click", async () => {
+        try {
+            const payment = await Pi.createPayment({
+                amount: 0.1, // Ajusta la cantidad según tu lógica de juego
+                memo: "Slot machine bet",
+                metadata: { game: "slots" }
+            }, {
+                onReadyForServerApproval: (paymentId) => console.log("Payment ready for approval", paymentId),
+                onReadyForServerCompletion: (paymentId) => console.log("Payment ready for completion", paymentId),
+                onCancel: (error) => console.error("Payment cancelled", error),
+                onError: (error) => console.error("Payment error", error)
+            });
+            console.log("Payment successful:", payment);
+            playBtn.disabled = false; // Habilita el botón de jugar tras pagar
+        } catch (err) {
+            console.error("Payment failed:", err);
+        }
+    });
+
+    // Juego de slots
+    playBtn.addEventListener("click", () => {
+        const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐", "🔔"];
+        const spinResult = symbols.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+        slots.forEach((slot, i) => slot.textContent = spinResult[i]);
         
-        console.log("Usuario autenticado:", authResult);
-        
-        // Si la autenticación es exitosa, mostramos el juego
-        document.getElementById("game").style.display = "block";
-    } catch (err) {
-        console.error("Error al autenticar:", err);
-    }
-});
-
-// Función del juego
-document.getElementById("playBtn").addEventListener("click", () => {
-    const symbols = ["🍒", "🍋", "🔔", "💎", "7️⃣"];
-    
-    // Generar tres símbolos aleatorios
-    const slot1 = symbols[Math.floor(Math.random() * symbols.length)];
-    const slot2 = symbols[Math.floor(Math.random() * symbols.length)];
-    const slot3 = symbols[Math.floor(Math.random() * symbols.length)];
-
-    // Mostrar los resultados
-    document.getElementById("slot1").innerText = slot1;
-    document.getElementById("slot2").innerText = slot2;
-    document.getElementById("slot3").innerText = slot3;
-
-    // Determinar si el usuario ha ganado
-    if (slot1 === slot2 && slot2 === slot3) {
-        document.getElementById("result").innerText = "🎉 You won! 🎉";
-    } else {
-        document.getElementById("result").innerText = "❌ Try again!";
-    }
+        if (new Set(spinResult).size === 1) {
+            resultText.textContent = "🎉 You won! 🎉";
+        } else {
+            resultText.textContent = "😞 You lost. Try again!";
+        }
+        playBtn.disabled = true;
+    });
 });
