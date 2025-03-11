@@ -1,15 +1,41 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background-color: #222;
+    background-color: #1a1a1a;
     color: white;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
 }
 
 button {
-    background-color: #f4c542;
+    background-color: #ffcc00;
     border: none;
     padding: 10px 20px;
-    font-size: 18px;
+    font-size: 1.2em;
     cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #e6b800;
+}
+
+#game {
     margin-top: 20px;
+}
+
+#slots {
+    font-size: 3em;
+    margin: 20px 0;
+}
+
+#result {
+    font-size: 1.5em;
+    margin-top: 10px;
 }
