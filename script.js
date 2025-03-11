@@ -1,7 +1,7 @@
 // Inicializar el SDK de Pi Network
 Pi.init({ version: "2.0" });
 // Reemplaza "TU_APP_ID" con el ID de tu app en Pi Network
-const appId = "casinopivegas";
+const appId = "dph0vlblv8wfdsu96qsdum1diom8xmfjsq9kfrozn4jamqluolgsrrn2l8jpflsx";
 
 // Esperar a que se cargue el SDK de Pi
 document.addEventListener("DOMContentLoaded", async () => {
