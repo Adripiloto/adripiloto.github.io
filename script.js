@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Realizar apuesta
        betBtn.addEventListener("click", async () => {
         try {
-            const response = await fetch("http://localhost:3000/initiate-payment", {
+            const response = await fetch("http://192.168.1.90:3000/initiate-payment", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount: 0.1, memo: "Slot machine bet" })
