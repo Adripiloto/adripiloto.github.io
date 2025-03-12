@@ -24,24 +24,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Realizar apuesta
-    betBtn.addEventListener("click", async () => {
+       betBtn.addEventListener("click", async () => {
         try {
-            const payment = await Pi.createPayment({
-                amount: 0.1, // Apuesta de 0.1 Pi
-                memo: "Slot machine bet",
-                metadata: { game: "slots" }
-            }, {
-                onReadyForServerApproval: (paymentId) => console.log("Payment ready for approval", paymentId),
-                onReadyForServerCompletion: (paymentId) => {
-                    console.log("Payment completed", paymentId);
-                    playBtn.disabled = false; // Habilita el botón de jugar tras pagar
-                },
-                onCancel: (error) => console.error("Payment cancelled", error),
-                onError: (error) => console.error("Payment error", error)
+            const response = await fetch("http://localhost:3000/initiate-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: 0.1, memo: "Slot machine bet" })
             });
-            console.log("Payment successful:", payment);
+
+            const data = await response.json();
+            if (data.success) {
+                console.log("Payment initialized:", data.paymentId);
+                playBtn.disabled = false;
+            } else {
+                console.error("Payment initialization failed:", data.error);
+            }
         } catch (err) {
-            console.error("Payment failed:", err);
+            console.error("Error placing bet:", err);
         }
     });
 
