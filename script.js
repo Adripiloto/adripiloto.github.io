@@ -1,5 +1,5 @@
 // Inicializar el SDK de Pi Network
-Pi.init({ version: "2.0", sandbox: true }); // Asegúrate de tener sandbox: true para desarrollo
+Pi.init({ version: "2.0", sandbox: false }); // Asegúrate de tener sandbox: true para desarrollo
 
 const appId = "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u";
 
