@@ -14,14 +14,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Login con Pi Network
     loginBtn.addEventListener("click", async () => {
-        try {
-            user = await Pi.authenticate(["payments"], (res) => res);
-            console.log("User authenticated:", user);
-            document.getElementById("game").style.display = "block";
-        } catch (err) {
-            console.error("Authentication error:", err);
-        }
-    });
+    try {
+        user = await Pi.authenticate(["payments"], (res) => res);
+        console.log("User authenticated:", user);
+        document.getElementById("game").style.display = "block";
+        // Mostrar el nombre de usuario
+        resultText.textContent = `Welcome, ${user.uid}!`;
+    } catch (err) {
+        console.error("Authentication error:", err);
+        resultText.textContent = "Authentication failed.";
+    }
+});
 
     // Realizar apuesta
     betBtn.addEventListener("click", async () => {
