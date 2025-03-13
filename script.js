@@ -33,45 +33,48 @@ document.addEventListener("DOMContentLoaded", async () => {
                     document.getElementById("slot2"),
                     document.getElementById("slot3"),
                 ];
+                console.log("betBtn:", betBtn);
+                console.log("playBtn:", playBtn);
+                if (betBtn && playBtn){ // Añadir comprobacion para asegurar que los botones existen.
+                    // Realizar apuesta
+                    betBtn.addEventListener("click", async () => {
+                        resultText.textContent = "";
+                        try {
+                            const payment = await Pi.createPayment({
+                                amount: 0.1,
+                                memo: "Slot machine bet",
+                                metadata: { game: "slots" },
+                            }, {
+                                onReadyForServerApproval: (paymentId) => console.log("Payment ready for approval", paymentId),
+                                onReadyForServerCompletion: (paymentId) => {
+                                    console.log("Payment completed", paymentId);
+                                    playBtn.disabled = false;
+                                },
+                                onCancel: (error) => console.error("Payment cancelled", error),
+                                onError: (error) => console.error("Payment error", error),
+                            });
+                            console.log("Payment successful:", payment);
+                        } catch (err) {
+                            console.error("Payment failed:", err);
+                            resultText.textContent = "Payment failed.";
+                        }
+                    });
 
-                // Realizar apuesta
-betBtn.addEventListener("click", async () => {
-    resultText.textContent = "";
-    try {
-        const payment = await Pi.createPayment({
-            amount: 0.1,
-            memo: "Slot machine bet",
-            metadata: { game: "slots" },
-        }, {
-            onReadyForServerApproval: (paymentId) => console.log("Payment ready for approval", paymentId),
-            onReadyForServerCompletion: (paymentId) => {
-                console.log("Payment completed", paymentId);
-                playBtn.disabled = false;
-            },
-            onCancel: (error) => console.error("Payment cancelled", error),
-            onError: (error) => console.error("Payment error", error),
-        });
-        console.log("Payment successful:", payment);
-    } catch (err) {
-        console.error("Payment failed:", err);
-        resultText.textContent = "Payment failed.";
-    }
-});
+                    // Juego de slots
+                    playBtn.addEventListener("click", () => {
+                        resultText.textContent = "";
+                        const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐", "🔔"];
+                        const spinResult = symbols.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+                        slots.forEach((slot, i) => slot.textContent = spinResult[i]);
 
-                // Juego de slots
-                playBtn.addEventListener("click", () => {
-                    resultText.textContent = "";
-                    const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐", "🔔"];
-                    const spinResult = symbols.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
-                    slots.forEach((slot, i) => slot.textContent = spinResult[i]);
-
-                    if (new Set(spinResult).size === 1) {
-                        resultText.textContent = "🎉 You won! 🎉";
-                    } else {
-                        resultText.textContent = "😞 You lost. Try again!";
-                    }
-                    playBtn.disabled = true;
-                });
+                        if (new Set(spinResult).size === 1) {
+                            resultText.textContent = "🎉 You won! 🎉";
+                        } else {
+                            resultText.textContent = "😞 You lost. Try again!";
+                        }
+                        playBtn.disabled = true;
+                    });
+                }
             })
             .catch(function (error) {
                 console.error("Authentication error:", error);
