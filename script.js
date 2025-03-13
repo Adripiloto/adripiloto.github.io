@@ -10,21 +10,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     const playBtn = document.getElementById("playBtn");
     const resultText = document.getElementById("result");
     const slots = [document.getElementById("slot1"), document.getElementById("slot2"), document.getElementById("slot3")];
-    let user;
+    let accessToken;
+    let username;
 
-    // Login con Pi Network
+    // Autenticar al usuario
     loginBtn.addEventListener("click", async () => {
-    try {
-        user = await Pi.authenticate(["payments"], (res) => res);
-        console.log("User object:", user);
-        document.getElementById("game").style.display = "block";
-        // Mostrar el userId
-        resultText.textContent = `User ID: ${user.userId}`;
-    } catch (err) {
-        console.error("Authentication error:", err);
-        resultText.textContent = "Authentication failed.";
-    }
-});
+        try {
+            const scopes = ['payments', 'username']; // Solicitar permisos de pagos y username
+            Pi.authenticate(scopes, (auth) => {
+                accessToken = auth.accessToken;
+                username = auth.user.username;
+                console.log("Authentication successful:", auth);
+                document.getElementById("game").style.display = "block";
+                resultText.textContent = `Welcome, ${username}!`; // Mostrar el username
+            }).catch((error) => {
+                console.error("Authentication error:", error);
+                resultText.textContent = "Authentication failed.";
+            });
+        } catch (err) {
+            console.error("Authentication error:", err);
+            resultText.textContent = "Authentication failed.";
+        }
+    });
 
     // Realizar apuesta
     betBtn.addEventListener("click", async () => {
