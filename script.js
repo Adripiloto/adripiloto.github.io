@@ -35,28 +35,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ];
 
                 // Realizar apuesta
-                betBtn.addEventListener("click", async () => {
-                    resultText.textContent = "";
-                    try {
-                        const payment = await Pi.createPayment({
-                            amount: 0.1,
-                            memo: "Slot machine bet",
-                            metadata: { game: "slots" },
-                        }, {
-                            onReadyForServerApproval: (paymentId) => console.log("Payment ready for approval", paymentId),
-                            onReadyForServerCompletion: (paymentId) => {
-                                console.log("Payment completed", paymentId);
-                                playBtn.disabled = false;
-                            },
-                            onCancel: (error) => console.error("Payment cancelled", error),
-                            onError: (error) => console.error("Payment error", error),
-                        });
-                        console.log("Payment successful:", payment);
-                    } catch (err) {
-                        console.error("Payment failed:", err);
-                        resultText.textContent = "Payment failed.";
-                    }
-                });
+betBtn.addEventListener("click", async () => {
+    resultText.textContent = "";
+    try {
+        const payment = await Pi.createPayment({
+            amount: 0.1,
+            memo: "Slot machine bet",
+            metadata: { game: "slots" },
+        }, {
+            onReadyForServerApproval: (paymentId) => console.log("Payment ready for approval", paymentId),
+            onReadyForServerCompletion: (paymentId) => {
+                console.log("Payment completed", paymentId);
+                playBtn.disabled = false;
+            },
+            onCancel: (error) => console.error("Payment cancelled", error),
+            onError: (error) => console.error("Payment error", error),
+        });
+        console.log("Payment successful:", payment);
+    } catch (err) {
+        console.error("Payment failed:", err);
+        resultText.textContent = "Payment failed.";
+    }
+});
 
                 // Juego de slots
                 playBtn.addEventListener("click", () => {
