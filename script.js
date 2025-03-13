@@ -1,7 +1,7 @@
 // Inicializar el SDK de Pi Network
 Pi.init({ version: "2.0", sandbox: true }); // Asegúrate de tener sandbox: true para desarrollo
 
-const appId = "dph0vlblv8wfdsu96qsdum1diom8xmfjsq9kfrozn4jamqluolgsrrn2l8jpflsx";
+const appId = "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u";
 
 // Esperar a que se cargue el SDK de Pi
 document.addEventListener("DOMContentLoaded", async () => {
