@@ -38,27 +38,27 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (betBtn && playBtn){ // Añadir comprobacion para asegurar que los botones existen.
                     // Realizar apuesta
                     betBtn.addEventListener("click", async () => {
-                        resultText.textContent = "";
-                        try {
-                            const payment = await Pi.createPayment({
-                                amount: 0.1,
-                                memo: "Slot machine bet",
-                                metadata: { game: "slots" },
-                            }, {
-                                onReadyForServerApproval: (paymentId) => console.log("Payment ready for approval", paymentId),
-                                onReadyForServerCompletion: (paymentId) => {
-                                    console.log("Payment completed", paymentId);
-                                    playBtn.disabled = false;
-                                },
-                                onCancel: (error) => console.error("Payment cancelled", error),
-                                onError: (error) => console.error("Payment error", error),
-                            });
-                            console.log("Payment successful:", payment);
-                        } catch (err) {
-                            console.error("Payment failed:", err);
-                            resultText.textContent = "Payment failed.";
-                        }
-                    });
+    resultText.textContent = "Conectando con el servidor de pagos...";
+    try {
+        const amount = 0.1;
+        const memo = "Slot machine bet";
+        const response = await fetch("http://192.168.1.90:3000/initiate-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount, memo }),
+        });
+        const data = await response.json();
+        if (data.success) {
+            resultText.textContent = "Pago iniciado. Esperando confirmación...";
+            // Puedes agregar aquí la lógica para manejar el pago completado
+        } else {
+            resultText.textContent = "Error al iniciar el pago.";
+        }
+    } catch (err) {
+        console.error("Error en el pago:", err);
+        resultText.textContent = "Error en el pago.";
+    }
+});
 
                     // Juego de slots
                     playBtn.addEventListener("click", () => {
