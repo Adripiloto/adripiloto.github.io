@@ -14,20 +14,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Login con Pi Network
     loginBtn.addEventListener("click", async () => {
-    try {
-        user = await Pi.authenticate(["payments"], (res) => res);
-        console.log("User authenticated:", user);
-        document.getElementById("game").style.display = "block";
-        // Mostrar el nombre de usuario
-        resultText.textContent = `Welcome, ${user.uid}!`;
-    } catch (err) {
-        console.error("Authentication error:", err);
-        resultText.textContent = "Authentication failed.";
-    }
-});
+        try {
+            user = await Pi.authenticate(["payments"], (res) => res);
+            console.log("User authenticated:", user);
+            document.getElementById("game").style.display = "block";
+            // Mostrar el nombre de usuario
+            resultText.textContent = `Welcome, ${user.uid}!`;
+        } catch (err) {
+            console.error("Authentication error:", err);
+            resultText.textContent = "Authentication failed.";
+        }
+    });
 
     // Realizar apuesta
     betBtn.addEventListener("click", async () => {
+        resultText.textContent = ""; // Limpiar el texto
         try {
             const payment = await Pi.createPayment({
                 amount: 0.1, // Apuesta de 0.1 Pi
@@ -45,15 +46,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log("Payment successful:", payment);
         } catch (err) {
             console.error("Payment failed:", err);
+            resultText.textContent = "Payment failed.";
         }
     });
 
     // Juego de slots
     playBtn.addEventListener("click", () => {
+        resultText.textContent = ""; // Limpiar el texto
         const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐", "🔔"];
         const spinResult = symbols.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
         slots.forEach((slot, i) => slot.textContent = spinResult[i]);
-        
+
         if (new Set(spinResult).size === 1) {
             resultText.textContent = "🎉 You won! 🎉";
         } else {
