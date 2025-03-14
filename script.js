@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
         const amount = 0.1;
         const memo = "Slot machine bet";
-        const response = await fetch("https://localhost/initiate-payment", {
+        const response = await fetch("https://192.168.1.90:3000/initiate-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ amount, memo }),
