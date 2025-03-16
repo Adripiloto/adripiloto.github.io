@@ -1,72 +1,84 @@
-// Asegúrate de que Pi esté inicializado
+// Inicializar el SDK de Pi Network
 Pi.init({ version: "2.0", sandbox: true });
 
-const scopes = ['payments', 'username'];
-let accessToken;
+const appId = "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u";
 
-Pi.authenticate(scopes, function(payment) {
-    console.log("Incomplete payment found:", payment);
-}).then(function(auth) {
-    accessToken = auth.accessToken;
-    console.log("Autenticación exitosa:", auth);
-}).catch(function(error) {
-    console.error("Error de autenticación:", error);
+// Esperar a que se cargue el SDK de Pi
+document.addEventListener("DOMContentLoaded", async () => {
+    const loginBtn = document.getElementById("loginBtn");
+    const resultText = document.getElementById("result");
+    let accessToken;
+    let username;
+
+    // Autenticar al usuario
+    loginBtn.addEventListener("click", () => {
+        const scopes = ["payments", "username"];
+
+        function onIncompletePaymentFound(payment) {
+            console.log("Incomplete payment found:", payment);
+        }
+
+        Pi.authenticate(scopes, onIncompletePaymentFound)
+            .then(function (auth) {
+                accessToken = auth.accessToken;
+                username = auth.user.username;
+                console.log("Authentication successful:", auth);
+                document.getElementById("game").style.display = "block";
+                resultText.textContent = `Welcome, ${username}!`;
+                // Inicialización de botones dentro del then, para asegurar que el DOM cargó.
+                const betBtn = document.getElementById("betBtn");
+                const playBtn = document.getElementById("playBtn");
+                const slots = [
+                    document.getElementById("slot1"),
+                    document.getElementById("slot2"),
+                    document.getElementById("slot3"),
+                ];
+                console.log("betBtn:", betBtn);
+                console.log("playBtn:", playBtn);
+                if (betBtn && playBtn){ // Añadir comprobacion para asegurar que los botones existen.
+                    // Realizar apuesta
+                    betBtn.addEventListener("click", async () => {
+    resultText.textContent = "Conectando con el servidor de pagos...";
+    try {
+        const amount = 0.1;
+        const memo = "Slot machine bet";
+        const response = await fetch("http://127.0.0.1:5000/payment/approve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount, memo }),
+        });
+        const data = await response.json();
+        if (data.success) {
+            resultText.textContent = "Pago iniciado. Esperando confirmación...";
+            // Puedes agregar aquí la lógica para manejar el pago completado
+        } else {
+            resultText.textContent = "Error al iniciar el pago.";
+        }
+    } catch (err) {
+        console.error("Error en el pago:", err);
+        resultText.textContent = "Error en el pago.";
+    }
 });
 
-function sendPaymentApprove(paymentDTO) {
-    console.log("Enviando solicitud POST a:", "http://127.0.0.1:5000/payment/approve");
-    console.log("Datos:", {
-        paymentId: paymentDTO.identifier,
-        accessToken: accessToken,
+                    // Juego de slots
+                    playBtn.addEventListener("click", () => {
+                        resultText.textContent = "";
+                        const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐", "🔔"];
+                        const spinResult = symbols.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+                        slots.forEach((slot, i) => slot.textContent = spinResult[i]);
+
+                        if (new Set(spinResult).size === 1) {
+                            resultText.textContent = "🎉 You won! 🎉";
+                        } else {
+                            resultText.textContent = "😞 You lost. Try again!";
+                        }
+                        playBtn.disabled = true;
+                    });
+                }
+            })
+            .catch(function (error) {
+                console.error("Authentication error:", error);
+                resultText.textContent = "Authentication failed.";
+            });
     });
-    fetch("http://127.0.0.1:5000/payment/approve", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-            paymentId: paymentDTO.identifier,
-            accessToken: accessToken,
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Respuesta de /payment/approve:", data);
-    })
-    .catch(error => {
-        console.error("Error en /payment/approve:", error);
-    });
-}
-
-// Repite el patrón para las otras rutas: sendPaymentComplete, sendPaymentCancel, sendPaymentError, sendMe
-
-function createPayment() {
-    const paymentData = {
-        amount: 0.01,
-        memo: "Test payment",
-        metadata: { orderId: 123 }
-    };
-
-    const paymentCallbacks = {
-        onReadyForServerApproval: (paymentDTO) => {
-            sendPaymentApprove(paymentDTO);
-        },
-        onReadyForServerCompletion: (paymentDTO, txid) => {
-            // Implementa sendPaymentComplete
-        },
-        onCancel: (paymentDTO) => {
-            // Implementa sendPaymentCancel
-        },
-        onError: (paymentDTO) => {
-            // Implementa sendPaymentError
-        },
-        onIncompletePaymentFound: (paymentDTO) => {
-            // Implementa sendPaymentComplete
-        }
-    };
-
-    Pi.createPayment(paymentData, paymentCallbacks);
-}
-
-// Asigna createPayment al evento click de tu botón de pago
-document.getElementById('betBtn').addEventListener('click', createPayment);
+});
