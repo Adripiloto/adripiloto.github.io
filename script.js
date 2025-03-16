@@ -35,30 +35,42 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ];
                 console.log("betBtn:", betBtn);
                 console.log("playBtn:", playBtn);
-                if (betBtn && playBtn){ // Añadir comprobacion para asegurar que los botones existen.
+                if (betBtn && playBtn) { // Añadir comprobacion para asegurar que los botones existen.
                     // Realizar apuesta
                     betBtn.addEventListener("click", async () => {
-    resultText.textContent = "Conectando con el servidor de pagos...";
-    try {
-        const amount = 0.1;
-        const memo = "Slot machine bet";
-        const response = await fetch("http://127.0.0.1:5000/payment/approve", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount, memo }),
-        });
-        const data = await response.json();
-        if (data.success) {
-            resultText.textContent = "Pago iniciado. Esperando confirmación...";
-            // Puedes agregar aquí la lógica para manejar el pago completado
-        } else {
-            resultText.textContent = "Error al iniciar el pago.";
-        }
-    } catch (err) {
-        console.error("Error en el pago:", err);
-        resultText.textContent = "Error en el pago.";
-    }
-});
+                        resultText.textContent = "Conectando con el servidor de pagos...";
+                        try {
+                            const paymentData = {
+                                amount: 0.1,
+                                memo: "Slot machine bet",
+                                metadata: { orderId: 123 }
+                            };
+
+                            const paymentCallbacks = {
+                                onReadyForServerApproval: (paymentDTO) => {
+                                    sendPaymentApprove(paymentDTO);
+                                },
+                                onReadyForServerCompletion: (paymentDTO, txid) => {
+                                    sendPaymentComplete(paymentDTO, txid);
+                                },
+                                onCancel: (paymentDTO) => {
+                                    sendPaymentCancel(paymentDTO);
+                                },
+                                onError: (paymentDTO) => {
+                                    sendPaymentError(paymentDTO);
+                                },
+                                onIncompletePaymentFound: (paymentDTO) => {
+                                    sendPaymentComplete(paymentDTO, paymentDTO.transaction.txid);
+                                }
+                            };
+
+                            Pi.createPayment(paymentData, paymentCallbacks);
+
+                        } catch (err) {
+                            console.error("Error en el pago:", err);
+                            resultText.textContent = "Error en el pago.";
+                        }
+                    });
 
                     // Juego de slots
                     playBtn.addEventListener("click", () => {
@@ -81,4 +93,106 @@ document.addEventListener("DOMContentLoaded", async () => {
                 resultText.textContent = "Authentication failed.";
             });
     });
+
+    function sendPaymentApprove(paymentDTO) {
+        console.log("Enviando solicitud POST a:", "http://127.0.0.1:5000/payment/approve");
+        console.log("Datos:", {
+            paymentId: paymentDTO.identifier,
+            accessToken: accessToken,
+        });
+        fetch("http://127.0.0.1:5000/payment/approve", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                paymentId: paymentDTO.identifier,
+                accessToken: accessToken,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta de /payment/approve:", data);
+        })
+        .catch(error => {
+            console.error("Error en /payment/approve:", error);
+        });
+    }
+
+    function sendPaymentComplete(paymentDTO, txid) {
+        console.log("Enviando solicitud POST a:", "http://127.0.0.1:5000/payment/complete");
+        console.log("Datos:", {
+            paymentId: paymentDTO.identifier,
+            txid: txid,
+            accessToken: accessToken,
+        });
+        fetch("http://127.0.0.1:5000/payment/complete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                paymentId: paymentDTO.identifier,
+                txid: txid,
+                accessToken: accessToken,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta de /payment/complete:", data);
+        })
+        .catch(error => {
+            console.error("Error en /payment/complete:", error);
+        });
+    }
+
+    function sendPaymentCancel(paymentDTO) {
+        console.log("Enviando solicitud POST a:", "http://127.0.0.1:5000/payment/cancel");
+        console.log("Datos:", {
+            paymentId: paymentDTO.identifier,
+            accessToken: accessToken,
+        });
+        fetch("http://127.0.0.1:5000/payment/cancel", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                paymentId: paymentDTO.identifier,
+                accessToken: accessToken,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta de /payment/cancel:", data);
+        })
+        .catch(error => {
+            console.error("Error en /payment/cancel:", error);
+        });
+    }
+
+    function sendPaymentError(paymentDTO) {
+        console.log("Enviando solicitud POST a:", "http://127.0.0.1:5000/payment/error");
+        console.log("Datos:", {
+            paymentId: paymentDTO.identifier,
+            accessToken: accessToken,
+        });
+        fetch("http://127.0.0.1:5000/payment/error", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                paymentId: paymentDTO.identifier,
+                accessToken: accessToken,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta de /payment/error:", data);
+        })
+        .catch(error => {
+            console.error("Error en /payment/error:", error);
+        });
+    }
 });
