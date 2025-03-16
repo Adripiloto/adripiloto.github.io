@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     function sendPaymentApprove(paymentDTO) {
-        console.log("Enviando solicitud POST a:", "http://127.0.0.1:5000/payment/approve");
+        console.log("Enviando solicitud POST a:", "https://comic-glowworm-harmless.ngrok-free.app");
         console.log("Datos:", {
             paymentId: paymentDTO.identifier,
             accessToken: accessToken,
