@@ -1,7 +1,7 @@
 document.getElementById("auth-button").addEventListener("click", function() {
     Pi.init({
         version: "2.0",  // Usa la versión más reciente
-        appId: "TU_APP_ID_AQUÍ",  // Cambia esto por tu ID de app en Pi Network
+        appId: "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u",  // Cambia esto por tu ID de app en Pi Network
         sandbox: true  // Deja en 'true' para pruebas, cambia a 'false' para producción
     });
 
