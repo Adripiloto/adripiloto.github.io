@@ -1,30 +1,30 @@
+// Inicializar Pi Network SDK al cargar la página
+Pi.init({
+    version: "2.0",
+    sandbox: true, // Cambiar a false en producción
+    appId: "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u" // Tu App ID de Pi Network
+});
+
+// Manejar autenticación del usuario al hacer clic en "Iniciar Sesión"
 document.getElementById("auth-button").addEventListener("click", function () {
     console.log("Botón de inicio de sesión presionado.");
 
-    // Inicializar Pi Network SDK
-    Pi.init({
-    version: "2.0",
-    sandbox: true, // Cambiar a false cuando pases a producción
-    appId: "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u" // Reemplaza con el ID de tu app en Pi Network
-});
-
-    // Autenticación del usuario
     Pi.authenticate(["username", "payments"], function (payment) {
         console.log("Pago incompleto encontrado:", payment);
     })
-        .then(function (auth) {
-            console.log("Usuario autenticado:", auth);
-            document.getElementById("welcome-message").textContent = `Bienvenido, ${auth.user.username}!`;
+    .then(function (auth) {
+        console.log("Usuario autenticado:", auth);
+        document.getElementById("welcome-message").textContent = `Bienvenido, ${auth.user.username}!`;
 
-            // Mostrar el botón de jugar después de autenticarse
-            document.getElementById("play-button").style.display = "block";
-        })
-        .catch(function (error) {
-            console.error("Error de autenticación:", error);
-        });
+        // Mostrar el botón de jugar después de autenticarse
+        document.getElementById("play-button").style.display = "block";
+    })
+    .catch(function (error) {
+        console.error("Error de autenticación:", error);
+    });
 });
 
-// Función para iniciar un pago en la app de slots
+// Manejar el pago cuando el usuario haga clic en "Jugar"
 document.getElementById("play-button").addEventListener("click", function () {
     console.log("Botón de jugar presionado.");
 
