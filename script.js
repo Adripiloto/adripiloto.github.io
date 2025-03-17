@@ -21,17 +21,66 @@ loginBtn.addEventListener("click", () => {
 });
 
 betBtn.addEventListener("click", () => {
-    // Lógica para iniciar el pago (usando tu backend)
-    spinBtn.disabled = false;
+    Pi.createPayment({
+        amount: "0.1",
+        memo: "Apuesta en Slots Game",
+    }, (payment) => {
+        console.log("Pago incompleto:", payment);
+    }).then(payment => {
+        console.log("Pago completado:", payment);
+        fetch("http://localhost:3000/pagar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                paymentId: payment.identifier,
+                accessToken: accessToken,
+            }),
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                spinBtn.disabled = false;
+            } else {
+                resultDiv.textContent = "Error al procesar el pago.";
+            }
+        }).catch(error => {
+            console.error("Error al enviar el pago al backend:", error);
+            resultDiv.textContent = "Error de comunicación.";
+        });
+    }).catch(error => {
+        console.error("Error al crear el pago:", error);
+        resultDiv.textContent = "Error al iniciar el pago.";
+    });
 });
 
 spinBtn.addEventListener("click", () => {
-    const symbols = ["", "", ""];
+    const symbols = ["", "", ""]; // Ejemplo de símbolos
     const spinResult = Array.from(slots).map(() => symbols[Math.floor(Math.random() * symbols.length)]);
     slots.forEach((slot, i) => slot.textContent = spinResult[i]);
+
     if (new Set(spinResult).size === 1) {
         resultDiv.textContent = "¡Ganaste 0.2 Pi!";
-        // Lógica para enviar el premio al usuario (usando tu backend)
+        fetch("http://localhost:3000/premio", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                destinoPublicKey: "CLAVE_PUBLICA_DEL_USUARIO", // Reemplaza con la clave pública del usuario
+                cantidad: "0.2",
+            }),
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("Premio enviado:", data.result);
+            } else {
+                resultDiv.textContent = "Error al enviar el premio.";
+            }
+        }).catch(error => {
+            console.error("Error al enviar el premio al backend:", error);
+            resultDiv.textContent = "Error de comunicación.";
+        });
     } else {
         resultDiv.textContent = "Perdiste.";
     }
