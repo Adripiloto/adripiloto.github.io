@@ -1,11 +1,9 @@
-// Asegurarnos de que el botón de inicio de sesión está funcionando
 document.getElementById("auth-button").addEventListener("click", function () {
     console.log("Botón de inicio de sesión presionado.");
 
     // Inicializar Pi Network SDK
     Pi.init({
         version: "2.0",
-        appId: "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u", // Reemplaza con el ID real de tu app en Pi Network
         sandbox: true // Cambiar a false cuando pases a producción
     });
 
@@ -17,8 +15,8 @@ document.getElementById("auth-button").addEventListener("click", function () {
             console.log("Usuario autenticado:", auth);
             document.getElementById("welcome-message").textContent = `Bienvenido, ${auth.user.username}!`;
 
-            // Una vez autenticado, ofrecerle al usuario jugar apostando Pi
-            iniciarPago();
+            // Mostrar el botón de jugar después de autenticarse
+            document.getElementById("play-button").style.display = "block";
         })
         .catch(function (error) {
             console.error("Error de autenticación:", error);
@@ -26,11 +24,13 @@ document.getElementById("auth-button").addEventListener("click", function () {
 });
 
 // Función para iniciar un pago en la app de slots
-function iniciarPago() {
+document.getElementById("play-button").addEventListener("click", function () {
+    console.log("Botón de jugar presionado.");
+
     const paymentData = {
         amount: 1, // Monto de la apuesta en Pi
         memo: "Pago para jugar al slot",
-        metadata: { InternalPaymentID: 1234 } // ID interno del pago (opcional)
+        metadata: { InternalPaymentID: Math.floor(Math.random() * 10000) } // ID interno aleatorio
     };
 
     const paymentCallbacks = {
@@ -39,12 +39,15 @@ function iniciarPago() {
         },
         onReadyForServerCompletion: function (paymentId, txid) {
             console.log("Pago completado con éxito:", paymentId, txid);
+            alert("¡Pago exitoso! Ahora puedes jugar.");
         },
         onCancel: function (paymentId) {
             console.log("Pago cancelado:", paymentId);
+            alert("Pago cancelado.");
         },
         onError: function (error, payment) {
             console.error("Error en el pago:", error, payment);
+            alert("Ocurrió un error con el pago.");
         }
     };
 
@@ -55,4 +58,4 @@ function iniciarPago() {
         .catch(function (error) {
             console.error("Error al crear el pago:", error);
         });
-}
+});
