@@ -67,7 +67,7 @@ spinBtn.addEventListener("click", () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                destinoPublicKey: "CLAVE_PUBLICA_DEL_USUARIO", // Reemplaza con la clave pública del usuario
+                destinoPublicKey: "GCFLB2NNGYJXILUQFCXYW2MMDBIHQA63EZKOVCV5F672CMSB3T2GGUOE", // Reemplaza con la clave pública del usuario
                 cantidad: "0.2",
             }),
         }).then(response => response.json())
