@@ -4,7 +4,7 @@ document.getElementById("auth-button").addEventListener("click", function () {
     // Inicializar Pi Network SDK
     Pi.init({
         version: "2.0",
-        sandbox: true // Cambiar a false cuando pases a producción
+        sandbox: true, // Cambiar a false cuando pases a producción
         appId: "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u" // Reemplaza con el ID de tu app en Pi Network
     });
 
