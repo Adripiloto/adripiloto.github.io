@@ -1,29 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casino-Pi-Vegas</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Pi Slots App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@pinetwork-js/sdk@latest"></script>
+    <script src="app.js" defer></script>
 </head>
 <body>
-    <h1>🎰 Casino-Pi-Vegas 🎰</h1>
-
-    <button id="loginBtn">Login with Pi</button>
-
-    <div id="game" style="display:none;">
-        <p>Press the button to spin the slots!</p>
-        <div id="slots">
-            <span id="slot1">❓</span>
-            <span id="slot2">❓</span>
-            <span id="slot3">❓</span>
-        </div>
-        <button id="betBtn">💰 Place Bet (0.1 Pi)</button>
-        <button id="playBtn" disabled>🎲 Spin</button>
-        <p id="result"></p>
-    </div>
-
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script src="script.js"></script>
+    <h1>Bienvenido a Pi Slots</h1>
+    <button id="auth-button">Iniciar Sesión con Pi</button>
 </body>
 </html>
