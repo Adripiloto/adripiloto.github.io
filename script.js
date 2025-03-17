@@ -1,14 +1,39 @@
-document.getElementById("auth-button").addEventListener("click", function() {
-    Pi.init({
-        version: "2.0",  // Usa la versión más reciente
-        appId: "sxfmtqkdbp2hp5v8rmyismfc4brgjbmbjtxakzeitelrlnvkdng04gieebb70e3u",  // Cambia esto por tu ID de app en Pi Network
-        sandbox: true  // Deja en 'true' para pruebas, cambia a 'false' para producción
-    });
+Pi.init({ version: "2.0", sandbox: true });
 
-    Pi.authenticate(["username", "payments"], function(user) {
-        console.log("Usuario autenticado:", user);
-        alert(`¡Bienvenido, ${user.username}!`);
-    }).catch(function(error) {
-        console.error("Error al autenticar:", error);
+const loginBtn = document.getElementById("loginBtn");
+const gameDiv = document.getElementById("game");
+const betBtn = document.getElementById("betBtn");
+const spinBtn = document.getElementById("spinBtn");
+const slots = document.querySelectorAll(".slot");
+const resultDiv = document.getElementById("result");
+let accessToken;
+
+loginBtn.addEventListener("click", () => {
+    Pi.authenticate(["payments"], (payment) => {
+        console.log("Incomplete payment:", payment);
+    }).then(auth => {
+        accessToken = auth.accessToken;
+        gameDiv.style.display = "block";
+        loginBtn.style.display = "none";
+    }).catch(error => {
+        console.error("Authentication error:", error);
     });
+});
+
+betBtn.addEventListener("click", () => {
+    // Lógica para iniciar el pago (usando tu backend)
+    spinBtn.disabled = false;
+});
+
+spinBtn.addEventListener("click", () => {
+    const symbols = ["", "", ""];
+    const spinResult = Array.from(slots).map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+    slots.forEach((slot, i) => slot.textContent = spinResult[i]);
+    if (new Set(spinResult).size === 1) {
+        resultDiv.textContent = "¡Ganaste 0.2 Pi!";
+        // Lógica para enviar el premio al usuario (usando tu backend)
+    } else {
+        resultDiv.textContent = "Perdiste.";
+    }
+    spinBtn.disabled = true;
 });
